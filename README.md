@@ -1,155 +1,108 @@
-# Meta-learning Integration of Unsupervised Anomaly Scores for Intrusion Detection in Defense Network Environments
+# 국방 네트워크 환경에서의 비지도 이상점수 통합 메타학습 기반 이상탐지
 
-> Unsupervised anomaly detection framework for defense network intrusion detection using heterogeneous anomaly scores and meta-learning.
+> 다양한 비지도 이상탐지 모델이 산출한 이상점수를 통합하여 네트워크 침입 탐지 성능을 향상시키는 메타학습 기반 프레임워크
 
-## Overview
+## 1. 개요
 
-This repository contains the implementation of the paper:
+이 저장소는 논문 **「국방 네트워크 환경에서의 비지도 이상점수 통합 메타학습 기반 이상탐지」**의 구현 코드를 정리한 저장소입니다.
 
-**Meta-learning Integration of Unsupervised Anomaly Scores for Intrusion Detection in Defense Network Environments**
+본 연구는 라벨이 충분하지 않거나 새로운 공격 유형이 지속적으로 등장하는 국방 네트워크 환경에서, 비지도 이상탐지 기반 침입 탐지의 강건성을 높이기 위한 방법을 제안합니다.
 
-The goal of this study is to improve intrusion detection performance in defense network environments where labeled attack data are limited and anomaly patterns continuously evolve.  
-To address this problem, we first generate anomaly scores from multiple unsupervised anomaly detection models and then integrate them through a neural-network-based meta-learning framework. The proposed approach is designed to reduce threshold sensitivity and improve robust detection performance across different network datasets.  [oai_citation:1‡3.18 국방 네트워크 환경에서의 비지도 이상점수 통합 메타학습 기반 이상탐지.pdf](sediment://file_000000002b4072068d85358c92e9e196)
+이를 위해 다음과 같은 절차를 수행하였습니다.
 
----
-
-## Key Features
-
-- Uses **five unsupervised anomaly detection models**
-  - k-Nearest Neighbors (kNN)
-  - Local Outlier Factor (LOF)
-  - Isolation Forest (IF)
-  - Histogram-based Outlier Score (HBOS)
-  - Autoencoder (AE)
-- Compares two preprocessing strategies
-  - **Min-Max normalization**
-  - **Quantile transformation**
-- Applies **bootstrap-based threshold estimation**
-- Integrates heterogeneous anomaly scores with a **meta-learning neural network**
-- Evaluated on two benchmark intrusion detection datasets
-  - **NSL-KDD**
-  - **UNSW-NB15**  [oai_citation:2‡3.18 국방 네트워크 환경에서의 비지도 이상점수 통합 메타학습 기반 이상탐지.pdf](sediment://file_000000002b4072068d85358c92e9e196)
+- 여러 비지도 이상탐지 모델의 탐지 특성을 비교
+- 전처리 방식(Min-Max 정규화, Quantile Transformation)에 따른 성능 차이 분석
+- 붓스트랩 기반 임계값 설정을 통한 임계값 안정화
+- 서로 다른 모델이 생성한 이상점수를 통합하는 신경망 기반 메타학습 모델 구축
 
 ---
 
-## Motivation
+## 2. 연구 배경
 
-Traditional signature-based intrusion detection systems are effective for known attack patterns, but they are limited in dynamic environments such as defense networks, where new or evolving attacks may not match predefined signatures.  
-Unsupervised anomaly detection is a practical alternative because it can learn the structure of normal traffic without requiring labeled attack data. However, its performance often depends heavily on preprocessing choices, anomaly score distributions, and threshold selection.
+기존의 시그니처 기반 침입 탐지 시스템은 사전에 정의된 공격 패턴과 라벨 데이터에 의존하기 때문에, 새로운 공격이나 동적으로 변화하는 네트워크 환경에 충분히 대응하기 어렵습니다.
 
-This repository implements a framework that combines multiple anomaly scores through meta-learning to overcome the limitations of individual unsupervised models.  [oai_citation:3‡3.18 국방 네트워크 환경에서의 비지도 이상점수 통합 메타학습 기반 이상탐지.pdf](sediment://file_000000002b4072068d85358c92e9e196)
-
----
-
-## Methodology
-
-### 1. Preprocessing
-Two preprocessing methods are considered for numerical variables:
-
-- **Min-Max normalization**
-- **Quantile transformation**
-
-These methods were compared to examine how they affect anomaly score distributions and downstream detection performance.  [oai_citation:4‡3.18 국방 네트워크 환경에서의 비지도 이상점수 통합 메타학습 기반 이상탐지.pdf](sediment://file_000000002b4072068d85358c92e9e196)
-
-### 2. Base Unsupervised Models
-Five unsupervised anomaly detection models are trained:
-
-- **kNN**
-- **LOF**
-- **Isolation Forest**
-- **HBOS**
-- **Autoencoder**  [oai_citation:5‡3.18 국방 네트워크 환경에서의 비지도 이상점수 통합 메타학습 기반 이상탐지.pdf](sediment://file_000000002b4072068d85358c92e9e196)
-
-### 3. Bootstrap-based Thresholding
-For each model, thresholds are estimated using bootstrap resampling on anomaly scores computed from normal validation data.  
-Specifically, 500 bootstrap samples are generated, and the threshold is determined from the median of the resulting threshold distribution.  [oai_citation:6‡3.18 국방 네트워크 환경에서의 비지도 이상점수 통합 메타학습 기반 이상탐지.pdf](sediment://file_000000002b4072068d85358c92e9e196)
-
-### 4. Meta-learning
-The anomaly scores from the selected unsupervised models are used as input features to a meta-model.  
-The meta-model is a neural network with:
-
-- 5-dimensional input
-- 1 hidden layer
-- Sigmoid output for binary classification
-- Binary cross-entropy loss
-- Adam optimizer  [oai_citation:7‡3.18 국방 네트워크 환경에서의 비지도 이상점수 통합 메타학습 기반 이상탐지.pdf](sediment://file_000000002b4072068d85358c92e9e196)
+이에 본 연구는 비지도 이상탐지 모델을 활용하여 정상/이상 패턴을 구분하고, 개별 모델의 이상점수를 통합하는 메타학습 구조를 통해 보다 안정적이고 강건한 이상탐지 프레임워크를 제안합니다.
 
 ---
 
-## Datasets
+## 3. 주요 기여
 
-### NSL-KDD
-- Designed to improve the structural issues of KDD Cup 99
-- 41 explanatory variables and 1 response variable
-- Train set: **125,973**
-- Test set: **22,544**  [oai_citation:8‡3.18 국방 네트워크 환경에서의 비지도 이상점수 통합 메타학습 기반 이상탐지.pdf](sediment://file_000000002b4072068d85358c92e9e196)
-
-### UNSW-NB15
-- Designed to better reflect modern network environments and attack scenarios
-- 42 explanatory variables and 2 response variables
-- Train set: **175,341**
-- Test set: **82,332**  [oai_citation:9‡3.18 국방 네트워크 환경에서의 비지도 이상점수 통합 메타학습 기반 이상탐지.pdf](sediment://file_000000002b4072068d85358c92e9e196)
+- 비지도 이상탐지 모델들의 이상점수를 통합하는 메타학습 프레임워크 제안
+- 왜도와 극단값이 큰 네트워크 트래픽 분포를 고려하여 Min-Max 정규화와 Quantile Transformation 비교
+- 붓스트랩 기반 임계값 설정을 통해 임계값 선택의 불안정성 완화
+- NSL-KDD, UNSW-NB15 두 벤치마크 데이터셋을 이용한 실험 수행
+- 개별 모델의 한계를 보완하고 이상점수 통합을 통해 보다 강건한 탐지 성능 확보
 
 ---
 
-## Hyperparameter Settings
+## 4. 사용 데이터셋
 
-| Model | Hyperparameters |
-|---|---|
-| kNN | Gower distance, k = 1 |
-| LOF | Gower distance, k = 10 |
-| IF | 100 trees, subsampling size = 512, feature subsampling ratio = 0.4 |
-| HBOS | Number of bins = 10 |
-| AE | Hidden layers = 32, 24; latent dimension = 16; Adam; learning rate = 0.001; batch size = 128; epochs = 500; early stopping = 20; tanh activation |  [oai_citation:10‡3.18 국방 네트워크 환경에서의 비지도 이상점수 통합 메타학습 기반 이상탐지.pdf](sediment://file_000000002b4072068d85358c92e9e196)
+### 4.1 NSL-KDD
+NSL-KDD는 KDD Cup 99 데이터셋의 중복성과 평가 편향 문제를 개선한 침입 탐지 벤치마크 데이터셋입니다.
 
----
+본 논문에서는 학습 데이터(`KDDTrain+`)와 평가 데이터(`KDDTest+`)를 사용하였습니다.
 
-## Main Results
+### 4.2 UNSW-NB15
+UNSW-NB15는 현대 네트워크 환경과 최신 공격 유형을 반영하기 위해 제안된 데이터셋입니다.
 
-### Model-wise AUC Comparison
-On **NSL-KDD**, most models achieved strong discrimination performance, and **AE** and **IF** showed particularly high AUC values.  
-On **UNSW-NB15**, model performance varied more substantially depending on preprocessing and algorithmic characteristics.  [oai_citation:11‡3.18 국방 네트워크 환경에서의 비지도 이상점수 통합 메타학습 기반 이상탐지.pdf](sediment://file_000000002b4072068d85358c92e9e196)
-
-### Meta-model Performance
-The meta-learning framework achieved strong overall performance on both datasets:
-
-| Dataset | AUC | Precision | Recall | Specificity | F1 Score |
-|---|---:|---:|---:|---:|---:|
-| NSL-KDD | 0.97 | 0.92 | 0.90 | 0.89 | 0.91 |
-| UNSW-NB15 | 0.95 | - | 0.97 | 0.62 | 0.85 |
-
-The results suggest that integrating heterogeneous anomaly scores improves robustness and reduces sensitivity to individual threshold settings.  [oai_citation:12‡3.18 국방 네트워크 환경에서의 비지도 이상점수 통합 메타학습 기반 이상탐지.pdf](sediment://file_000000002b4072068d85358c92e9e196)  [oai_citation:13‡3.18 국방 네트워크 환경에서의 비지도 이상점수 통합 메타학습 기반 이상탐지.pdf](sediment://file_000000002b4072068d85358c92e9e196)
+본 논문에서는 UNSW-NB15의 학습 데이터와 평가 데이터를 사용하여 실험을 수행하였습니다.
 
 ---
 
-## Repository Structure
+## 5. 사용 모델
 
-```bash
-.
-├── data/
-│   ├── raw/
-│   ├── processed/
-│   └── README.md
-├── preprocessing/
-│   ├── minmax.py
-│   ├── quantile.py
-│   └── encoding.py
-├── models/
-│   ├── knn.py
-│   ├── lof.py
-│   ├── iforest.py
-│   ├── hbos.py
-│   └── autoencoder.py
-├── thresholding/
-│   └── bootstrap_threshold.py
-├── meta_learning/
-│   └── meta_model.py
-├── experiments/
-│   ├── run_nsl_kdd.py
-│   └── run_unsw_nb15.py
-├── results/
-│   ├── figures/
-│   ├── tables/
-│   └── logs/
-├── requirements.txt
-└── README.md
+본 연구에서는 다음의 다섯 가지 비지도 이상탐지 모델을 사용하였습니다.
+
+- **k-Nearest Neighbors (kNN)**
+- **Local Outlier Factor (LOF)**
+- **Histogram-based Outlier Score (HBOS)**
+- **Isolation Forest (IF)**
+- **Autoencoder (AE)**
+
+각 모델은 개별적으로 이상점수(anomaly score)를 산출하며, 이 점수들은 이후 메타모델의 입력변수로 활용됩니다.
+
+---
+
+## 6. 전처리 및 임계값 설정
+
+### 6.1 전처리 방식
+본 연구에서는 네트워크 트래픽 데이터의 왜도와 heavy-tailed 특성을 고려하여 다음 두 가지 전처리 방식을 비교하였습니다.
+
+- **Min-Max Normalization**
+- **Quantile Transformation**
+
+Quantile Transformation은 극단값의 영향을 줄이고 이상점수 분포를 보다 안정적으로 만드는 데 목적이 있습니다.
+
+### 6.2 붓스트랩 기반 임계값 설정
+비지도 이상탐지에서는 임계값 설정이 성능에 큰 영향을 미치므로, 본 연구에서는 개별 이상점수에 대해 **붓스트랩 기반 임계값 설정**을 적용하였습니다.
+
+이를 통해 전처리 방식과 임계값 설정 조합이 탐지 성능에 미치는 영향을 체계적으로 비교하였습니다.
+
+---
+
+## 7. 메타학습 구조
+
+개별 비지도 이상탐지 모델은 서로 다른 기준과 구조로 이상점수를 생성하므로, 각 모델의 탐지 양상은 상이할 수 있습니다.
+
+본 연구에서는 이러한 이질적인 이상점수 표현을 효과적으로 통합하기 위해 **인공신경망 기반 메타학습 모델**을 구축하였습니다.
+
+- **입력:** 다섯 개 비지도 이상탐지 모델이 생성한 이상점수
+- **출력:** 해당 관측치가 공격 트래픽일 확률
+
+이 구조를 통해 특정 단일 모델에 대한 의존도를 줄이고, 다양한 모델의 장점을 통합하고자 하였습니다.
+
+---
+
+## 8. 주요 실험 결과
+
+논문에서 보고한 주요 결과는 다음과 같습니다.
+
+- **NSL-KDD:** AUC 0.98
+- **UNSW-NB15:** AUC 0.95
+- **UNSW-NB15:** 재현율 최대 0.97
+
+또한 NSL-KDD 데이터셋에서는 메타모델이 정밀도, 재현율, 특이도, F1 점수 측면에서 비교적 균형적인 성능을 보였습니다.
+
+이 결과는 서로 다른 비지도 모델의 이상점수를 통합함으로써 임계값 민감도를 줄이고, 보다 강건한 탐지 성능을 확보할 수 있음을 시사합니다.
+
+---
