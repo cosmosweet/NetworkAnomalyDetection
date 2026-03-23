@@ -12,7 +12,4 @@ logs/
 checkpoints/
 
 # Data (usually not committed)
-data/
-data_UNSW-NB15/
-*.csv
 .Rhistory
